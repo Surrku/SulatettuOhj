@@ -32,8 +32,16 @@ static struct gpio_callback button_0_data;
 void button_0_handler(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
 {
 	printk("Button pressed\n");
-        //jos pause päällä = palautetaan edellinen tila
-        //pause päälle = nykyinen tila talteen
+
+        if (led_state != 4) {
+                old_state = led_state;
+                led_state = 4;
+                printk("Blinking paused\n");
+
+        } else {
+                led_state = old_state;
+                printk("Blinking resumed\n");
+        }
 
 }
 
@@ -48,9 +56,11 @@ int main(void)
 	}
 
         led_state = 1;
-        led_state = 2;
-        led_state = 3;
+        //led_state = 2;
+        //led_state = 3;
         //led_state = 4; //pause button
+
+        direction = 1;
 
 	return 0;
 }
@@ -99,7 +109,10 @@ void red_led_task(void *, void *, void*) {
 		        // 4. sleep for 2 seconds
 		        k_sleep(K_SECONDS(1));
 
+					if (led_state != 4) {
                         led_state = 2;
+                        direction = 0;
+						}
                 } 
                 k_yield();
 	}
@@ -111,21 +124,29 @@ void yellow_led_task(void *, void *, void*) {
 	
 	printk("Yellowled thread started\n");
 	while (true) {
-                if (led_state == 2) {
-                        // 1. set led on 
-                        gpio_pin_set_dt(&red,1);
-                        gpio_pin_set_dt(&green,1);
-                        printk("Yellow on\n");
-                        // 2. sleep for 2 seconds
-                        k_sleep(K_SECONDS(1));
-                        // 3. set led off
-                        gpio_pin_set_dt(&red,0);
-                        gpio_pin_set_dt(&green,0);
-                        printk("Yellow off\n");
-                        // 4. sleep for 2 seconds
-                        k_sleep(K_SECONDS(1));
+            if (led_state == 2) {
+                    // 1. set led on 
+                    gpio_pin_set_dt(&red,1);
+                    gpio_pin_set_dt(&green,1);
+                    printk("Yellow on\n");
+                    // 2. sleep for 2 seconds
+                    k_sleep(K_SECONDS(1));
+                    // 3. set led off
+                    gpio_pin_set_dt(&red,0);
+                    gpio_pin_set_dt(&green,0);
+                    printk("Yellow off\n");
+                    // 4. sleep for 2 seconds
+                    k_sleep(K_SECONDS(1));
 
-                        led_state = 3;
+
+					if (led_state != 4) {
+                		if (direction == 1) {
+                        	led_state = 1;  
+                		} else {
+                        	led_state = 3;  
+                	}
+				}
+
                 }
                 k_yield();
 	}
@@ -148,7 +169,10 @@ void green_led_task(void *, void *, void*) {
                         // 4. sleep for 2 seconds
                         k_sleep(K_SECONDS(1));
 
-                        led_state = 1;
+						if (led_state != 4) {
+                        	led_state = 2;
+                        	direction = 1;
+						}
                 }
                 k_yield();
 	}
