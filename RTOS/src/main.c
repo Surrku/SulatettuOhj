@@ -13,7 +13,7 @@
 #define BUTTON_3 DT_ALIAS(sw3)
 #define BUTTON_4 DT_ALIAS(sw4)
 
-int led_state = 0; // 0 = idle, 1 = red, 2 = yellow, 3 = green
+int led_state = 0; // 0 = idle, 1 = red, 2 = yellow, 3 = green, 4 = pause, 5 = only yellow
 int old_state = 0;
 int direction = 0; // 0 = down, 1 = up
 
@@ -41,6 +41,7 @@ static struct gpio_callback button_2_data;
 static struct gpio_callback button_3_data;
 static struct gpio_callback button_4_data;
 
+//Pause button
 void button_0_handler(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
 {
 	printk("Button 0 pressed\n");
@@ -57,24 +58,71 @@ void button_0_handler(const struct device *dev, struct gpio_callback *cb, uint32
 
 }
 
+//Red led on/off button
 void button_1_handler(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
 {
 	printk("Button 1 pressed\n");
+
+		if (led_state == 4) {
+			gpio_pin_toggle_dt(&red);
+		
+		int pin_state = gpio_pin_get_dt(&red);
+		if (pin_state > 0) {
+			printk("Red led on\n");
+		} else {
+			printk("Red led off\n");
+		}
+	}
 }
 
+//Yellow led on/off button
 void button_2_handler(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
 {
 	printk("Button 2 pressed\n");
+
+		if (led_state == 4) {
+			gpio_pin_toggle_dt(&green);
+			gpio_pin_toggle_dt(&red);
+		
+		int pin_state = gpio_pin_get_dt(&red);
+		if (pin_state > 0) {
+			printk("Yellow led on\n");
+		} else {
+			printk("Yellow led off\n");
+		}
+	}
 }
 
+//Green led on/off button
 void button_3_handler(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
 {
 	printk("Button 3 pressed\n");
+
+		if (led_state == 4) {
+			gpio_pin_toggle_dt(&green);
+		
+		int pin_state = gpio_pin_get_dt(&green);
+		if (pin_state > 0) {
+			printk("Green led on\n");
+		} else {
+			printk("Green led off\n");
+		}
+	}
 }
 
+//Blinking yellow light button
 void button_4_handler(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
 {
 	printk("Button 4 pressed\n");
+
+		if (led_state == 5) {
+			led_state = old_state;
+			printk("Yellow-only stopped\n");
+		} else {
+			old_state = led_state;
+			led_state = 5;
+			printk("Yellow-only started\n");
+		}
 }
 
 // Main program
@@ -156,7 +204,7 @@ void yellow_led_task(void *, void *, void*) {
 	
 	printk("Yellowled thread started\n");
 	while (true) {
-            if (led_state == 2) {
+            if (led_state == 2 || led_state == 5) {
                     // 1. set led on 
                     gpio_pin_set_dt(&red,1);
                     gpio_pin_set_dt(&green,1);
@@ -171,7 +219,7 @@ void yellow_led_task(void *, void *, void*) {
                     k_sleep(K_SECONDS(1));
 
 
-					if (led_state != 4) {
+					if (led_state == 2) {
                 		if (direction == 1) {
                         	led_state = 1;  
                 		} else {
@@ -303,7 +351,7 @@ int init_button() {
 
 	//BUTTON 4
 	if (!gpio_is_ready_dt(&button_4)) {
-		printk("Error: button 2 is not ready\n");
+		printk("Error: button 4 is not ready\n");
 		return -1;
 	}
 
