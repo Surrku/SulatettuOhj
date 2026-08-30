@@ -189,7 +189,7 @@ void red_led_task(void *, void *, void*) {
 		        // 4. sleep for 2 seconds
 		        k_sleep(K_SECONDS(1));
 
-					if (led_state != 4) {
+					if (led_state != 4 && led_state != 5) {
                         led_state = 2;
                         direction = 0;
 						}
@@ -249,7 +249,7 @@ void green_led_task(void *, void *, void*) {
                         // 4. sleep for 2 seconds
                         k_sleep(K_SECONDS(1));
 
-						if (led_state != 4) {
+						if (led_state != 4 && led_state != 5) {
                         	led_state = 2;
                         	direction = 1;
 						}
