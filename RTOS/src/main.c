@@ -1,3 +1,8 @@
+//viikko 1 - 3p tavoite - ledit pyörivät liikennevalosyklissä, nappi ykkösessä on pause-toiminto jolla vilkutus loppuu
+//ja jatkuu samasta kohdasta kun nappia painetaan uudestaan. yksittäiset ledit saa päälle napeista 2-4 kun pause on ensin painettu päälle.
+//jatkuvasti vilkkuva keltainen led saadaan päälle 5 napista, pausea ei tarvitse painaa erikseen. pelkälle keltaiselle ledille on oma state (5).
+
+
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/device.h>
