@@ -1,5 +1,5 @@
-//viikko 2 - 1p - valosekvenssi toimii terminaalin kautta syöttämällä R(red), Y(yellow) ja/tai G(green). 
-//Värit vilkkuvat kirjoitetussa järjestyksessä ja printtaavat termniaaliin.
+//viikko 2 - 2p - valosekvenssi toimii terminaalin kautta syöttämällä R(red), Y(yellow) ja/tai G(green). 
+//taskit eivät pyöri enää superloopeilla
 
 
 #include <zephyr/kernel.h>
@@ -231,7 +231,7 @@ void red_led_task(void *, void *, void*) {
 		printk("Red off\n");
 		k_sleep(K_SECONDS(1));
 
-                k_condvar_broadcast(&release_signal);
+        k_condvar_broadcast(&release_signal);
 	}
 }
 
@@ -240,7 +240,7 @@ void yellow_led_task(void *, void *, void*) {
 	
 	printk("Yellow led thread started\n");
 	while (true) {
-                k_condvar_wait(&yellow_signal, &yellow_mutex, K_FOREVER);
+        k_condvar_wait(&yellow_signal, &yellow_mutex, K_FOREVER);
 		// 1. set led on 
 		gpio_pin_set_dt(&red,1);
         gpio_pin_set_dt(&green,1);
@@ -252,7 +252,7 @@ void yellow_led_task(void *, void *, void*) {
 		printk("Yellow off\n");
 		k_sleep(K_SECONDS(1));
 
-                k_condvar_broadcast(&release_signal);
+        k_condvar_broadcast(&release_signal);
 
 	}
 }
@@ -262,7 +262,7 @@ void green_led_task(void *, void *, void*) {
 	
 	printk("Green led thread started\n");
 	while (true) {
-                k_condvar_wait(&green_signal, &green_mutex, K_FOREVER);
+        k_condvar_wait(&green_signal, &green_mutex, K_FOREVER);
 		// 1. set led on 
 		gpio_pin_set_dt(&green,1);
 		printk("Green on\n");
@@ -272,7 +272,7 @@ void green_led_task(void *, void *, void*) {
 		printk("Green off\n");
 		k_sleep(K_SECONDS(1));
 
-                k_condvar_broadcast(&release_signal);
+        k_condvar_broadcast(&release_signal);
 
 	}
 }
