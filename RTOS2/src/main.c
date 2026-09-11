@@ -1,6 +1,5 @@
 //viikko 2 - 2p - valosekvenssi toimii terminaalin kautta syöttämällä R(red), Y(yellow) ja/tai G(green). 
-//taskit eivät pyöri enää superloopeilla
-
+//leditaskit eivät pyöri superloopilla vaan signaali & conditional variablea käyttäen
 
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
@@ -84,10 +83,6 @@ int main(void)
 		return ret;
 	}
 
-        k_condvar_broadcast(&red_signal);
-        k_condvar_broadcast(&green_signal);
-        k_condvar_broadcast(&yellow_signal);
-
 	return 0;
 }
 
@@ -158,24 +153,26 @@ static void dispatcher_task(void *unused1, void *unused2, void *unused3)
                 while (sequence[cnt] != 0) {
 
                         if (sequence[cnt] == 'R') {
-                                printk("RED");
+                                printk("RED\n");
                                 // Start sequence
 	                        k_condvar_broadcast(&red_signal);
 
                         }
                         if (sequence[cnt] == 'Y') {
-                                printk("YELLOW");
+                                printk("YELLOW\n");
                                 k_condvar_broadcast(&yellow_signal);
 
                         }
                         if (sequence[cnt] == 'G') {
-                                printk("GREEN");
+                                printk("GREEN\n");
                                 k_condvar_broadcast(&green_signal);
 
                         }
                         cnt++;
 
-                        k_condvar_wait(&release_signal, &release_mutex, K_FOREVER);
+                        k_mutex_lock(&release_mutex, K_FOREVER);
+						k_condvar_wait(&release_signal, &release_mutex, K_FOREVER);
+						k_mutex_unlock(&release_mutex);
 
                 }
         // You need to:
@@ -219,9 +216,11 @@ int  init_led() {
 // Task to handle red led
 void red_led_task(void *, void *, void*) {
 	
-	printk("Red led thread started\n");
+	printk("Red led ready\n");
 	while (true) {
+		k_mutex_lock(&red_mutex, K_FOREVER);
 		k_condvar_wait(&red_signal, &red_mutex, K_FOREVER);
+		k_mutex_unlock(&red_mutex);
 		// 1. set led on 
 		gpio_pin_set_dt(&red,1);
 		printk("Red on\n");
@@ -230,39 +229,39 @@ void red_led_task(void *, void *, void*) {
 		gpio_pin_set_dt(&red,0);
 		printk("Red off\n");
 		k_sleep(K_SECONDS(1));
-
-        k_condvar_broadcast(&release_signal);
+		k_condvar_broadcast(&release_signal);
 	}
 }
 
 // Task to handle yellow led
 void yellow_led_task(void *, void *, void*) {
 	
-	printk("Yellow led thread started\n");
+	printk("Yellow led ready\n");
 	while (true) {
-        k_condvar_wait(&yellow_signal, &yellow_mutex, K_FOREVER);
+		k_mutex_lock(&yellow_mutex, K_FOREVER);
+		k_condvar_wait(&yellow_signal, &yellow_mutex, K_FOREVER);
+		k_mutex_unlock(&yellow_mutex);
 		// 1. set led on 
 		gpio_pin_set_dt(&red,1);
-        gpio_pin_set_dt(&green,1);
+		gpio_pin_set_dt(&green,1);
 		printk("Yellow on\n");
 		k_sleep(K_SECONDS(1));
 		// 3. set led off
 		gpio_pin_set_dt(&red,0);
-        gpio_pin_set_dt(&green,0);
+		gpio_pin_set_dt(&green,0);
 		printk("Yellow off\n");
 		k_sleep(K_SECONDS(1));
-
-        k_condvar_broadcast(&release_signal);
-
+		k_condvar_broadcast(&release_signal);
 	}
 }
 
 // Task to handle green led
 void green_led_task(void *, void *, void*) {
-	
-	printk("Green led thread started\n");
 	while (true) {
-        k_condvar_wait(&green_signal, &green_mutex, K_FOREVER);
+		printk("Green led ready\n");
+		k_mutex_lock(&green_mutex, K_FOREVER);
+		k_condvar_wait(&green_signal, &green_mutex, K_FOREVER);
+		k_mutex_unlock(&green_mutex);
 		// 1. set led on 
 		gpio_pin_set_dt(&green,1);
 		printk("Green on\n");
@@ -271,9 +270,7 @@ void green_led_task(void *, void *, void*) {
 		gpio_pin_set_dt(&green,0);
 		printk("Green off\n");
 		k_sleep(K_SECONDS(1));
-
-        k_condvar_broadcast(&release_signal);
-
+		k_condvar_broadcast(&release_signal);
 	}
 }
 
