@@ -225,10 +225,11 @@ void red_led_task(void *, void *, void*) {
 		// 1. set led on 
 		gpio_pin_set_dt(&red,1);
 		printk("Red on\n");
-		k_msleep(1000);
+		k_sleep(K_SECONDS(1));
 		// 3. set led off
 		gpio_pin_set_dt(&red,0);
 		printk("Red off\n");
+		k_sleep(K_SECONDS(1));
 
                 k_condvar_broadcast(&release_signal);
 	}
@@ -244,11 +245,12 @@ void yellow_led_task(void *, void *, void*) {
 		gpio_pin_set_dt(&red,1);
         gpio_pin_set_dt(&green,1);
 		printk("Yellow on\n");
-		k_msleep(1000);
+		k_sleep(K_SECONDS(1));
 		// 3. set led off
 		gpio_pin_set_dt(&red,0);
         gpio_pin_set_dt(&green,0);
 		printk("Yellow off\n");
+		k_sleep(K_SECONDS(1));
 
                 k_condvar_broadcast(&release_signal);
 
@@ -264,10 +266,11 @@ void green_led_task(void *, void *, void*) {
 		// 1. set led on 
 		gpio_pin_set_dt(&green,1);
 		printk("Green on\n");
-		k_msleep(1000);
+		k_sleep(K_SECONDS(1));
 		// 3. set led off
 		gpio_pin_set_dt(&green,0);
 		printk("Green off\n");
+		k_sleep(K_SECONDS(1));
 
                 k_condvar_broadcast(&release_signal);
 
