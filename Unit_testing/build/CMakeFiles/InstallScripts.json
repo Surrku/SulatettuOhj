@@ -1,0 +1,11 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/SJK2026/SulatettuOhj/Unit_testing/build/cmake_install.cmake",
+		"C:/SJK2026/SulatettuOhj/Unit_testing/build/googletest/cmake_install.cmake",
+		"C:/SJK2026/SulatettuOhj/Unit_testing/build/googletest/googlemock/cmake_install.cmake",
+		"C:/SJK2026/SulatettuOhj/Unit_testing/build/googletest/googletest/cmake_install.cmake",
+		"C:/SJK2026/SulatettuOhj/Unit_testing/build/test_cases/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
