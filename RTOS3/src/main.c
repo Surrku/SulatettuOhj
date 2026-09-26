@@ -8,7 +8,11 @@
 
 //tehtävä 5 -> 2p -> testikeisseihin lisätty boundary value-testit, kuvankaappaus Screenshot kansiossa
 //timeparser.c ja .h lisätty RTOS3seen, aikakeskeytys toimii terminaalin kautta ja laittaa punaisen ledin päälle
+//viikkotehtävään liittyvät muokkaukset tehty:
+//---> main.c
+//---> dispatch.c
 //lisättyjä testikeissejä: merkkijonon pituus, merkkijonossa vain numeroita, merkkijono ei ole NULL
+
 
 
 #include <zephyr/kernel.h>
